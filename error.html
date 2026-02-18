@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .popup { background: #fff; width: 280px; border-radius: 12px; text-align: center; overflow: hidden; animation: scaleUp 0.1s ease-out; }
+        @keyframes scaleUp { from { transform: scale(1.1); } to { transform: scale(1); } }
+        .popup-content { padding: 25px 20px; border-bottom: 1px solid #dbdbdb; }
+        .popup-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        .popup-msg { font-size: 14px; color: #262626; line-height: 18px; }
+        .ok-btn { width: 100%; padding: 14px; border: none; background: #fff; color: #0095f6; font-size: 14px; font-weight: 700; cursor: pointer; outline: none; }
+        .ok-btn:active { background: #fafafa; }
+    </style>
+</head>
+<body>
+    <div class="popup">
+        <div class="popup-content">
+            <div class="popup-title">Incorrect password</div>
+            <div class="popup-msg">The password you entered is incorrect. Please try again.</div>
+        </div>
+        <button class="ok-btn" onclick="location.href='index.html'">OK</button>
+    </div>
+</body>
+</html>
